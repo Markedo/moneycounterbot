@@ -1,11 +1,12 @@
-package com.tgbotyms.moneycounterbot.entities;
+package com.tgbotyms.moneycounterbot.model;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
-@MappedSuperclass
+@Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 @AllArgsConstructor
 @NoArgsConstructor
 public abstract class BasicEntity {

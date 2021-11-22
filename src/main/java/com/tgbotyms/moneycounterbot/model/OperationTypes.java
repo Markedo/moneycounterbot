@@ -1,4 +1,4 @@
-package com.tgbotyms.moneycounterbot.entities;
+package com.tgbotyms.moneycounterbot.model;
 
 public enum OperationTypes {
     INCOME,
