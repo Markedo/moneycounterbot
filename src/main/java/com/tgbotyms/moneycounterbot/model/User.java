@@ -3,9 +3,10 @@ package com.tgbotyms.moneycounterbot.model;
 import lombok.*;
 import javax.persistence.*;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.Calendar;
 import java.util.Date;
 
 @Entity
@@ -14,9 +15,13 @@ import java.util.Date;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class User extends BasicEntity {
+public class User {
 
-    @Column(name = "tg-user-id")
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
+    @Column(name = "tg_user_id")
     private String tgUserId;
 
     @Column(name = "name")
@@ -28,23 +33,36 @@ public class User extends BasicEntity {
     @Column(name = "password")
     private String password;
 
-    @Column(name = "current-balance")
-    private BigDecimal currentBalance;
+    @Column(name = "current_balance")
+    private BigDecimal currentBalance = BigDecimal.ZERO;;
 
-    @Column(name = "daysDivision", columnDefinition = "integer default 30")
-    @NotBlank
+    @Column(name = "days_division", columnDefinition = "integer default 30")
     @NotNull
     @Min(value = 1, message = "Days division cannot be less than 1")
-    private int daysDivision;
+    private int daysDivision = 30;
 
     @NotNull
-    @NotBlank
-    private Date calculationDate;
+    @Column(name = "calculation_date")
+    private LocalDate calculationDate = LocalDate.now();
 
-    public User(String tgUserCode, BigDecimal currentBalance, int daysDivision, Date calculationDate) {
-        this.tgUserId = tgUserCode;
-        this.currentBalance = currentBalance;
-        this.daysDivision = daysDivision;
-        this.calculationDate = calculationDate;
+    @Column(name = "days_left", columnDefinition = "integer default 30")
+    @Min(value = 1, message = "Days left cannot be less than 1")
+    @NotNull
+    private int daysLeft = 30;
+
+
+    public User(String tgUserId) {
+        this.tgUserId = tgUserId;
     }
+/*
+    public User(String tgUserId, BigDecimal currentBalance) {
+        this.tgUserId = tgUserId;
+        this.currentBalance = currentBalance;
+    }
+
+    public User(String tgUserId, int daysDivision) {
+        this.tgUserId = tgUserId;
+        this.daysDivision = daysDivision;
+    }
+     */
 }

@@ -4,12 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.stereotype.Component;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -20,25 +17,28 @@ import java.util.Date;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Operation extends BasicEntity {
+public class Operation {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
+    @Column(name = "tg_user_id")
+    private String tgUserId;
+
+    private OperationTypes operationType;
 
     @NotNull
-    @NotBlank
     @DecimalMin(value = "0.0")
     private BigDecimal operationAmount;
 
     @NotNull
-    @NotBlank
-    private OperationTypes operationType;
-
-    @NotNull
-    @NotBlank
     private Date operationDate;
 
     private String userComment;
 
-    public Operation(Long id, OperationTypes operationType, BigDecimal operationAmount, Date operationDate) { //hope it works
-        super(id);
+    public Operation(String tgUserId, OperationTypes operationType, BigDecimal operationAmount, Date operationDate) {
+        this.tgUserId = tgUserId;
         this.operationType = operationType;
         this.operationAmount = operationAmount;
         this.operationDate = operationDate;

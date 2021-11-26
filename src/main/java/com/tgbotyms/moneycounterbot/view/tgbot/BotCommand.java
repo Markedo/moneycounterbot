@@ -19,7 +19,8 @@ public abstract class BotCommand {
     //Response texts
     public static final String RespAddIncome = "Пожалуйста введите доход";
     public static final String RespAddExpense = "Пожалуйста введите расход (без минуса и иных знаков, только число)";
-    public static final String RespShowBalance = "Текущий баланс: ";
+    public static final String RespShowBalance = "Доступный баланс на день: ";
+    public static final String RespShowDaysLeft = ", осталось дней: ";
     public static final String RespSetPeriod = "Введите количество дней, на которые следует разделить бюджет";
     public static final String RespDeleteProfile = "Вы уверены, что хотите удалить все данные? Восстановление будет невозможно. Если Вы согласны, наберите (без кавычек): ";
     public static final String RespDefault = "Приветствую! Выберите комманду для продолжения";
@@ -35,5 +36,5 @@ public abstract class BotCommand {
 
     //Other
     public static final String BotCommandError = "Комманда не распознана";
-    public static final String START = "/start";
+    public static final String Start = "/start";
 }
