@@ -5,6 +5,7 @@ import com.tgbotyms.moneycounterbot.model.OperationTypes;
 import com.tgbotyms.moneycounterbot.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.math.BigDecimal;
@@ -19,6 +20,7 @@ This class contains all commands performed by the program
 */
 
 @Service
+@Transactional
 @Validated
 public class Operations {
 
@@ -28,14 +30,13 @@ public class Operations {
     @Autowired
     UserRepository userRepository;
 
-    public void UserCheckAndAdd(String tgUserId) {
+    public void UserCheckAndAdd(long tgUserId) {
         if(userRepository.findBytgUserId(tgUserId) == null) {
             userRepository.save(new User(tgUserId));
         }
-        else System.out.println("User exist");
     }
 
-        public void addIncome(String tgUserId, BigDecimal income) {
+        public void addIncome(long tgUserId, BigDecimal income) {
             Date operationDate = Calendar.getInstance().getTime();
             //Saving the operation
             Operation operation = new Operation(tgUserId, OperationTypes.INCOME,income, operationDate);
@@ -46,7 +47,7 @@ public class Operations {
             userRepository.save(user);
         }
 
-    public void addExpense(String tgUserId, BigDecimal expense) {
+    public void addExpense(long tgUserId, BigDecimal expense) {
         //Saving the operation
         Operation operation = new Operation(tgUserId, OperationTypes.EXPENSE,expense, Calendar.getInstance().getTime());
         operationsRepository.save(operation);
@@ -56,7 +57,7 @@ public class Operations {
         userRepository.save(user);
     }
 
-    private void daysLeftActualisation(String tgUserId) {
+    private void daysLeftActualisation(long tgUserId) {
         User user = userRepository.findBytgUserId(tgUserId);
         LocalDate calculationDate = user.getCalculationDate();
         LocalDate currentDate = LocalDate.now();
@@ -77,27 +78,27 @@ public class Operations {
         }
     }
 
-    public BigDecimal calculateCurrentBalance(String tgUserId) {
+    public BigDecimal calculateCurrentBalance(long tgUserId) {
         daysLeftActualisation(tgUserId);
         User user = userRepository.findBytgUserId(tgUserId);
         System.out.println(user.getCurrentBalance().divide(new BigDecimal(user.getDaysLeft()), 2, RoundingMode.HALF_UP));
         return user.getCurrentBalance().divide(new BigDecimal(user.getDaysLeft()), 2, RoundingMode.HALF_UP);
     }
 
-    public int getDaysLeft(String tgUserId) {
-        //daysLeftActualisation(tgUserId); //Actualisation is not necessary since this method is used after {@link #calculateCurrentBalance(String tgUserId)}
+    public int getDaysLeft(long tgUserId) {
+        //daysLeftActualisation(tgUserId); //Actualisation is not necessary since this method is used after {@link #calculateCurrentBalance(long tgUserId)}
         return userRepository.findBytgUserId(tgUserId).getDaysLeft();
     }
 
-    public void changePeriod(String tgUserId, int days) {
+    public void changePeriod(long tgUserId, int days) {
         User user = userRepository.findBytgUserId(tgUserId);
         user.setDaysDivision(days);
         user.setDaysLeft(days);
         userRepository.save(user);
     }
 
-    public void deleteUserData(String tgUserId) {
-        //userRepository.deleteBytgUserId(tgUserId);
-        //operationsRepository.deleteAllBytgUserId(tgUserId);
+    public void deleteUserData(long tgUserId) {
+        userRepository.deleteBytgUserId(tgUserId);
+       operationsRepository.deleteAllBytgUserId(tgUserId);
     }
 }

@@ -3,7 +3,7 @@ package com.tgbotyms.moneycounterbot.view.tgbot;
 import lombok.Getter;
 
 /*
-This class contains list of available bot commands
+This class contains list of available bot commands and responses
  */
 
 @Getter

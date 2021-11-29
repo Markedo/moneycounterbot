@@ -22,7 +22,7 @@ public class User {
     private Long id;
 
     @Column(name = "tg_user_id")
-    private String tgUserId;
+    private long tgUserId;
 
     @Column(name = "name")
     private String name;
@@ -51,18 +51,8 @@ public class User {
     private int daysLeft = 30;
 
 
-    public User(String tgUserId) {
+    public User(long tgUserId) {
         this.tgUserId = tgUserId;
-    }
-/*
-    public User(String tgUserId, BigDecimal currentBalance) {
-        this.tgUserId = tgUserId;
-        this.currentBalance = currentBalance;
     }
 
-    public User(String tgUserId, int daysDivision) {
-        this.tgUserId = tgUserId;
-        this.daysDivision = daysDivision;
-    }
-     */
 }

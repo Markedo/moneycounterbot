@@ -9,5 +9,5 @@ import java.util.List;
 
 @Repository
 public interface OperationsRepository extends JpaRepository<Operation, Long> {
-    List<User> deleteAllBytgUserId(String tgUserId);
+    void deleteAllBytgUserId(long tgUserId);
 }
