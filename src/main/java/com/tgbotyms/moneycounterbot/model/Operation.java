@@ -24,12 +24,12 @@ public class Operation {
     private Long id;
 
     @Column(name = "tg_user_id")
-    private String tgUserId;
+    private long tgUserId;
 
     private OperationTypes operationType;
 
-    @NotNull
-    @DecimalMin(value = "0.0")
+    @NotNull(message = ErrorMessages.NotNullMsg)
+    @DecimalMin(value = "0.0", message = ErrorMessages.SumLessThanZero)
     private BigDecimal operationAmount;
 
     @NotNull
@@ -37,7 +37,7 @@ public class Operation {
 
     private String userComment;
 
-    public Operation(String tgUserId, OperationTypes operationType, BigDecimal operationAmount, Date operationDate) {
+    public Operation(long tgUserId, OperationTypes operationType, BigDecimal operationAmount, Date operationDate) {
         this.tgUserId = tgUserId;
         this.operationType = operationType;
         this.operationAmount = operationAmount;

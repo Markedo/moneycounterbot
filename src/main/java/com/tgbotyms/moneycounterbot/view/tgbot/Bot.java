@@ -1,9 +1,13 @@
 package com.tgbotyms.moneycounterbot.view.tgbot;
 
 import com.tgbotyms.moneycounterbot.controllers.Operations;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.TransactionSystemException;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -16,7 +20,12 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
+/*
+This class provides main functionality of Telegram Bot
+ */
+@Slf4j
 @Component
+@Validated
 public class Bot extends TelegramLongPollingBot {
 
     @Value("${bot.name}")
@@ -41,86 +50,106 @@ public class Bot extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
             if (update.hasMessage()) {
+                log.debug("A new message was received from User " + update.getMessage().getChatId());
                 Message message = update.getMessage();
                 SendMessage newsm = new SendMessage();
                 newsm.setChatId(message.getChatId().toString());
 
-                if (update.getMessage().getReplyToMessage() == null) { //initial reply
+                if (update.getMessage().getReplyToMessage() == null) {
+                    //The section below provides reply to initial message from users and shows them a menu in other cases
+                    operations.UserCheckAndAdd(message.getChatId());
                     switch (message.getText()) {
                         case (BotCommand.Start):
-                            operations.UserCheckAndAdd(message.getChatId().toString());
+                            operations.UserCheckAndAdd(message.getChatId());
                             newsm.setText(BotCommand.RespDefault);
                             newsm.setReplyMarkup(getKeyboard());
+                            log.debug("User " + message.getChatId() + "chosen command: " + BotCommand.Start);
                             break;
                         case (BotCommand.KeyAddIncome):
                             newsm.setText(BotCommand.RespAddIncome);
                             newsm.setReplyToMessageId(message.getMessageId());
                             newsm.setReplyMarkup(new ForceReplyKeyboard());
+                            log.debug("User " + message.getChatId() + "chosen command: " + BotCommand.KeyAddIncome);
                             break;
                         case (BotCommand.KeyAddExpense):
                             newsm.setText(BotCommand.RespAddExpense);
                             newsm.setReplyToMessageId(message.getMessageId());
                             newsm.setReplyMarkup(new ForceReplyKeyboard());
+                            log.debug("User " + message.getChatId() + "chosen command: " + BotCommand.KeyAddExpense);
                             break;
                         case (BotCommand.KeyShowBalance):
-                            BigDecimal balance = operations.calculateCurrentBalance(message.getChatId().toString());
-                            int DaysLeft = operations.getDaysLeft(message.getChatId().toString());
+                            BigDecimal balance = operations.calculateCurrentBalance(message.getChatId());
+                            int DaysLeft = operations.getDaysLeft(message.getChatId());
                             newsm.setText(BotCommand.RespShowBalance + balance + BotCommand.RespShowDaysLeft + DaysLeft);
                             newsm.setReplyMarkup(getKeyboard());
+                            log.debug("User " + message.getChatId() + "chosen command: " + BotCommand.KeyShowBalance);
                             break;
                         case (BotCommand.KeySetPeriod):
                             newsm.setText(BotCommand.RespSetPeriod);
                             newsm.setReplyMarkup(new ForceReplyKeyboard());
+                            log.debug("User " + message.getChatId() + "chosen command: " + BotCommand.KeySetPeriod);
                             break;
                         case (BotCommand.KeyDeleteProfile):
                             newsm.setText(BotCommand.RespDeleteProfile + " \"" + BotCommand.RespDeleteConfirm+ "\"");
                             newsm.setReplyMarkup(new ForceReplyKeyboard());
+                            log.debug("User " + message.getChatId() + "chosen command: " + BotCommand.KeyDeleteProfile);
                             break;
                         default:
                             newsm.setText(BotCommand.RespDefault);
                             newsm.setReplyMarkup(getKeyboard());
+                            log.debug("User " + message.getChatId() + "command  not recognized");
                             break;
                     }
 
                 }
-                else { //selected action handler
+                //The section below handle the selected action
+                else {
                    switch (message.getReplyToMessage().getText()) {
                        case(BotCommand.RespAddIncome):
-                           System.out.println(message.getText());
-                           BigDecimal income = new BigDecimal(message.getText());
-                           operations.addIncome(message.getChatId().toString(), income);
+                          try {
+                           log.debug("Income add command started");
+                           operations.addIncome(message.getChatId(), new BigDecimal(message.getText()));
                            newsm.setText(BotCommand.StatIncomeAdded);
                            newsm.setReplyMarkup(getKeyboard());
+                           log.debug(BotCommand.RespAddIncome + " command by User" + message.getChatId() + " finished successfully");
+                       }
+                        catch (Exception e) {
+                               //newsm.setText(e.getMessage());
+                               log.debug(e.getMessage());
+                               log.debug(e.getCause().getMessage());
+                               log.debug(e.getCause().getCause().getMessage());
+                         }
                            break;
                        case (BotCommand.RespAddExpense):
-                           System.out.println(message.getText());
                            BigDecimal expense = new BigDecimal(message.getText());
-                           operations.addExpense(message.getChatId().toString(), expense);
+                           operations.addExpense(message.getChatId(), expense);
                            newsm.setText(BotCommand.StatExpenseAdded);
                            newsm.setReplyMarkup(getKeyboard());
+                           log.debug(BotCommand.RespAddIncome + " command by User" + message.getChatId() + " finished successfully");
                            break;
                        case (BotCommand.RespSetPeriod):
-                           System.out.println(message.getText());
-                           operations.changePeriod(message.getChatId().toString(), Integer.parseInt(message.getText()));
+                           operations.changePeriod(message.getChatId(), Integer.parseInt(message.getText()));
                            newsm.setText(BotCommand.StatPeriodChanged);
                            newsm.setReplyMarkup(getKeyboard());
+                           log.debug(BotCommand.RespSetPeriod + " command by User" + message.getChatId() + " finished successfully");
                            break;
                        case (BotCommand.RespDeleteProfile+ " \"" + BotCommand.RespDeleteConfirm+ "\""):
                            if(message.getText().equals(BotCommand.RespDeleteConfirm)) {
-                               operations.deleteUserData(message.getChatId().toString());
-                               System.out.println(message.getText());
+                               operations.deleteUserData(message.getChatId());
                                newsm.setText(BotCommand.StatProfileDeleted);
                                newsm.setReplyMarkup(getKeyboard());
+                               log.debug(BotCommand.RespDeleteProfile+ " command by User" + message.getChatId() + " finished successfully");
                            }
                            else {
                                newsm.setText(BotCommand.StatProfileDeleteError);
-                               System.out.println(message.getText());
                                newsm.setReplyMarkup(getKeyboard());
+                               log.debug(BotCommand.RespDeleteProfile + " command by User" + message.getChatId() + " was not performed due to an error in the keyword for delete");
                            }
                            break;
                        default:
                            newsm.setText(BotCommand.BotCommandError);
                            newsm.setReplyMarkup(getKeyboard());
+                           log.debug("Command by User" + message.getChatId() + " not recognized");
                            break;
                    }
                 }
@@ -133,7 +162,7 @@ public class Bot extends TelegramLongPollingBot {
             }
         }
 
-
+    //The section below forms bot commands keyboard for users
     private ReplyKeyboardMarkup getKeyboard() {
 
         ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
