@@ -63,41 +63,41 @@ public class Bot extends TelegramLongPollingBot {
                             operations.UserCheckAndAdd(message.getChatId());
                             newsm.setText(BotCommand.RespDefault);
                             newsm.setReplyMarkup(getKeyboard());
-                            log.debug("User " + message.getChatId() + "chosen command: " + BotCommand.Start);
+                            log.debug("User " + message.getChatId() + " chosen command: " + BotCommand.Start);
                             break;
                         case (BotCommand.KeyAddIncome):
                             newsm.setText(BotCommand.RespAddIncome);
                             newsm.setReplyToMessageId(message.getMessageId());
                             newsm.setReplyMarkup(new ForceReplyKeyboard());
-                            log.debug("User " + message.getChatId() + "chosen command: " + BotCommand.KeyAddIncome);
+                            log.debug("User " + message.getChatId() + " chosen command: " + BotCommand.KeyAddIncome);
                             break;
                         case (BotCommand.KeyAddExpense):
                             newsm.setText(BotCommand.RespAddExpense);
                             newsm.setReplyToMessageId(message.getMessageId());
                             newsm.setReplyMarkup(new ForceReplyKeyboard());
-                            log.debug("User " + message.getChatId() + "chosen command: " + BotCommand.KeyAddExpense);
+                            log.debug("User " + message.getChatId() + " chosen command: " + BotCommand.KeyAddExpense);
                             break;
                         case (BotCommand.KeyShowBalance):
                             BigDecimal balance = operations.calculateCurrentBalance(message.getChatId());
                             int DaysLeft = operations.getDaysLeft(message.getChatId());
                             newsm.setText(BotCommand.RespShowBalance + balance + BotCommand.RespShowDaysLeft + DaysLeft);
                             newsm.setReplyMarkup(getKeyboard());
-                            log.debug("User " + message.getChatId() + "chosen command: " + BotCommand.KeyShowBalance);
+                            log.debug("User " + message.getChatId() + " chosen command: " + BotCommand.KeyShowBalance);
                             break;
                         case (BotCommand.KeySetPeriod):
                             newsm.setText(BotCommand.RespSetPeriod);
                             newsm.setReplyMarkup(new ForceReplyKeyboard());
-                            log.debug("User " + message.getChatId() + "chosen command: " + BotCommand.KeySetPeriod);
+                            log.debug("User " + message.getChatId() + " chosen command: " + BotCommand.KeySetPeriod);
                             break;
                         case (BotCommand.KeyDeleteProfile):
                             newsm.setText(BotCommand.RespDeleteProfile + " \"" + BotCommand.RespDeleteConfirm+ "\"");
                             newsm.setReplyMarkup(new ForceReplyKeyboard());
-                            log.debug("User " + message.getChatId() + "chosen command: " + BotCommand.KeyDeleteProfile);
+                            log.debug("User " + message.getChatId() + " chosen command: " + BotCommand.KeyDeleteProfile);
                             break;
                         default:
                             newsm.setText(BotCommand.RespDefault);
                             newsm.setReplyMarkup(getKeyboard());
-                            log.debug("User " + message.getChatId() + "command  not recognized");
+                            log.debug("User " + message.getChatId() + " command  not recognized");
                             break;
                     }
 
